@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-from brownie import PocketToken
+from brownie import PocketToken, config
 from scripts.helpful_scripts import (
     BLOCK_CONFIRMATIONS_FOR_VERIFICATION,
     get_account,
@@ -8,21 +8,20 @@ from scripts.helpful_scripts import (
 )
 
 
-def deploy_price_feed_consumer():
-    account = get_account()
-    eth_usd_price_feed_address = get_contract("eth_usd_price_feed").address
-    price_feed = PriceFeedConsumer.deploy(
-        eth_usd_price_feed_address,
-        {"from": account},
-    )
-
+def deploy_pocket_token():
+    account = get_account(sk=1)
+    
+    pocket_token = PocketToken.deploy(
+            {"from": account},
+        )
+    
     if is_verifiable_contract():
-        price_feed.tx.wait(BLOCK_CONFIRMATIONS_FOR_VERIFICATION)
-        PriceFeedConsumer.publish_source(price_feed)
+        pocket_token.tx.wait(BLOCK_CONFIRMATIONS_FOR_VERIFICATION)
+        PocketToken.publish_source(pocket_token)
 
-    print(f"The current price of ETH is {price_feed.getLatestPrice()}")
-    return price_feed
+    print(f"Token with name: {pocket_token.name()}, symbol: {pocket_token.symbol()}, decimals: {pocket_token.decimals()} and total supply: {pocket_token.totalSupply()} is created at address:{pocket_token.address}")
+    return pocket_token
 
 
 def main():
-    deploy_price_feed_consumer()
+    deploy_pocket_token()

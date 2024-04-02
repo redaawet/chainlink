@@ -43,14 +43,16 @@ def is_verifiable_contract() -> bool:
     return config["networks"][network.show_active()].get("verify", False)
 
 
-def get_account(index=None, id=None):
+def get_account(index=None, id=None, sk=None):
     if index:
         return accounts[index]
     if network.show_active() in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
         return accounts[0]
     if id:
         return accounts.load(id)
-    return accounts.add(config["wallets"]["from_key"])
+    if sk:
+        return accounts.add(config["wallets"]["from_key"][sk])
+    return None
 
 
 def get_contract(contract_name):
